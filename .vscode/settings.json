@@ -1,4 +1,5 @@
 {
     "workbench.startupEditor": "readme",
-    "markdown.preview.openMarkdownLinks": "inPreview"
+    "markdown.preview.openMarkdownLinks": "inPreview",
+    "workbench.colorTheme": "Tomorrow Night Blue"
 }
