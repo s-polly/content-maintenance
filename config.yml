@@ -5,13 +5,14 @@ repositories:
   # Azure AI Foundry samples repository
   foundry-samples:
     owner: "microsoft-foundry"
-    repo: "foundry-samples"
+    repo: "foundry-samples-pr"
     team: "@microsoft-foundry/AI-Platform-Docs"
-    short_name: "foundry-samples"
+    short_name: "foundry-samples-pr"
     service_type: "ai"
     pr_report_arg: "ai"
     search_paths:
-      - "articles/ai-foundry"
+      - "articles/foundry"
+      - "articles/foundry-samples"
       - "articles/machine-learning"
   
   # Azure AI samples repository  
@@ -23,7 +24,8 @@ repositories:
     service_type: "ai"
     pr_report_arg: "ai2"
     search_paths:
-      - "articles/ai-foundry"
+      - "articles/foundry"
+      - "articles/foundry-samples"
       - "articles/machine-learning"
 
   # Azure ML examples repository
@@ -35,7 +37,8 @@ repositories:
     service_type: "ml"
     pr_report_arg: "ml"
     search_paths:
-      - "articles/ai-foundry"
+      - "articles/foundry"
+      - "articles/foundry-samples"
       - "articles/machine-learning"
 
 # Output directory for generated files
