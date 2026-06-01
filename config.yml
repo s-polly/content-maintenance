@@ -6,13 +6,15 @@ repositories:
   foundry-samples:
     owner: "microsoft-foundry"
     repo: "foundry-samples-pr"
+    snippet_repo: "foundry-samples"
+    sync_delay_hours: 24  # PR repo syncs to public repo once/day; wait before triggering doc updates
     team: "@microsoft-foundry/AI-Platform-Docs"
     short_name: "foundry-samples-pr"
     service_type: "ai"
     pr_report_arg: "ai"
     search_paths:
       - "articles/foundry"
-      - "articles/foundry-samples"
+      - "articles/foundry-classic"
       - "articles/machine-learning"
   
   # Azure AI samples repository  
@@ -25,7 +27,7 @@ repositories:
     pr_report_arg: "ai2"
     search_paths:
       - "articles/foundry"
-      - "articles/foundry-samples"
+      - "articles/foundry-classic"
       - "articles/machine-learning"
 
   # Azure ML examples repository
@@ -38,7 +40,7 @@ repositories:
     pr_report_arg: "ml"
     search_paths:
       - "articles/foundry"
-      - "articles/foundry-samples"
+      - "articles/foundry-classic"
       - "articles/machine-learning"
 
 # Output directory for generated files

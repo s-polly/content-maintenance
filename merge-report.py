@@ -451,7 +451,13 @@ Updated `update-code` metadata for documentation files impacted by recent code r
     # Aggregate results from all repos
     all_results = []
     for owner_name, repo_name in zip(owner_names, repo_names):
-        repo_results = f.find_pr_files(owner_name, repo_name, snippets, days)
+        # Look up sync_delay_hours for this repo
+        delay = 0
+        for rc in repos_config.values():
+            if rc["owner"] == owner_name and rc["repo"] == repo_name:
+                delay = rc.get("sync_delay_hours", 0)
+                break
+        repo_results = f.find_pr_files(owner_name, repo_name, snippets, days, sync_delay_hours=delay)
         if isinstance(repo_results, dict) and "error" in repo_results:
             print(f"Error for repo {repo_name}: {repo_results['error']}")
         elif repo_results:
@@ -508,7 +514,7 @@ if __name__ == "__main__":
     
     # Always use all repos from config.yml
     repos_config = config.get_repositories()
-    repo_args = [(repo_config["owner"], repo_config["repo"]) for repo_config in repos_config.values()]
+    repo_args = [(repo_config["owner"], repo_config["repo"], repo_config.get("sync_delay_hours", 0)) for repo_config in repos_config.values()]
 
     output_dir = config.get_output_directory()
     file_paths = config.get_file_paths()
@@ -519,8 +525,8 @@ if __name__ == "__main__":
     skipped_prs = []  # Track PRs we skip because they were already processed
     
     def process_repo(args):
-        owner_name, repo_name = args
-        repo_results = f.find_pr_files(owner_name, repo_name, snippets, days)
+        owner_name, repo_name, delay = args
+        repo_results = f.find_pr_files(owner_name, repo_name, snippets, days, sync_delay_hours=delay)
         if isinstance(repo_results, dict) and "error" in repo_results:
             print(f"Error for repo {repo_name}: {repo_results['error']}")
         elif repo_results:

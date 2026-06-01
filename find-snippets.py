@@ -34,7 +34,7 @@ def find_snippets():
     repo_configs = {}
     for repo_key, repo_config in repos_config.items():
         repo_configs[repo_key] = {
-            "repo_token": repo_config["repo"],
+            "repo_token": repo_config.get("snippet_repo", repo_config["repo"]),
             "owners": repo_config["team"]
         }
     
@@ -45,7 +45,7 @@ def find_snippets():
             all_search_paths.add(path)
     
     search_paths = [
-        {"path": path, "include_subdirs": True if "ai-foundry" in path else False}
+        {"path": path, "include_subdirs": True if "foundry" in path else False}
         for path in sorted(all_search_paths)
     ]
     
@@ -94,7 +94,11 @@ def find_snippets():
                 continue
                 
             file = os.path.basename(content_file.path)
-            file_content = content_file.decoded_content
+            try:
+                file_content = content_file.decoded_content
+            except Exception as e:
+                print(f"Error reading {content_file.path}: {e}")
+                continue
             lines = file_content.decode().splitlines()
 
             blocks = []
@@ -129,7 +133,7 @@ def find_snippets():
                             
                             if branch == az_branch:  # PRs are merged into main, so only these files are relevant
                                 # Extract the complete directory path from content_file.path
-                                # content_file.path looks like: "articles/ai-foundry/includes/create-project-fdp.md"
+                                # content_file.path looks like: "articles/foundry/includes/create-project-fdp.md"
                                 # We want to extract everything after "articles/" and before the filename
                                 full_path = content_file.path
                                 if "articles/" in full_path:
@@ -138,7 +142,7 @@ def find_snippets():
                                     from_file_dir = dir_part
                                 else:
                                     # Fallback to the original logic if path structure is unexpected
-                                    from_file_dir = "ai-foundry" if "ai-foundry" in content_file.path else "machine-learning"
+                                    from_file_dir = "foundry" if "foundry" in content_file.path else "machine-learning"
                                 
                                 row_dict = {"ref_file": ref_file, "from_file": file}
                                 all_dict_lists[repo_key].append(row_dict)
@@ -158,7 +162,7 @@ def find_snippets():
                 
             if blocks:
                 # this file has code blocks. add info to the dictionary
-                path_name = "ai-foundry" if "ai-foundry" in content_file.path else "machine-learning"
+                path_name = "foundry" if "foundry" in content_file.path else "machine-learning"
                 for block in blocks:
                     all_code_counts.append({"file": content_file.path, "type": block[0], "lines": block[1], "start_line": block[2], "path": path_name})
 
@@ -178,7 +182,6 @@ def find_snippets():
         owners = config["owners"]
         
         # Create output filenames (only for CODEOWNERS, not refs-found)
-        path_name = "ai-foundry" if repo_key in ["ai", "ai2"] else "machine-learning"
         codeowners_fn = os.path.join(output_dir, f"CODEOWNERS-{repo_token}.txt")
         
         # Process found snippets
@@ -206,7 +209,7 @@ def find_snippets():
     # Write code counts file
     if all_code_counts:
         code_counts = pd.DataFrame(all_code_counts)
-        for path_name in ["machine-learning", "ai-foundry"]:
+        for path_name in ["machine-learning", "foundry"]:
             path_counts = code_counts[code_counts["path"] == path_name]
             if not path_counts.empty:
                 code_counts_fn = os.path.join(output_dir, f"code-counts-{path_name}.csv")

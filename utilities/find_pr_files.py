@@ -1,6 +1,6 @@
 # function to find PRs merged in the last N days that have doc references
 # used from merge_report
-def find_pr_files(owner_name, repo_name, snippets, days):
+def find_pr_files(owner_name, repo_name, snippets, days, sync_delay_hours=0):
     import requests
     import os
     import pandas as pd
@@ -13,6 +13,12 @@ def find_pr_files(owner_name, repo_name, snippets, days):
     else:
         # Return error info to caller
         return {"error": "The maximum number of days is 100."}
+
+    # For repos that sync to a public repo (e.g., foundry-samples-pr),
+    # only include PRs merged at least sync_delay_hours ago
+    ready_cutoff = None
+    if sync_delay_hours > 0:
+        ready_cutoff = (datetime.now() - timedelta(hours=sync_delay_hours)).isoformat()
 
     # Define the URL for the GitHub API
     url = f"https://api.github.com/repos/{owner_name}/{repo_name}/pulls?state=closed&sort=updated&direction=desc"
@@ -32,7 +38,9 @@ def find_pr_files(owner_name, repo_name, snippets, days):
 
     # Filter the PRs that were merged in the last N days
     merged_prs = [
-        pr["number"] for pr in pr_data if pr.get("merged_at") and pr["merged_at"] > days_ago
+        pr["number"] for pr in pr_data 
+        if pr.get("merged_at") and pr["merged_at"] > days_ago
+        and (ready_cutoff is None or pr["merged_at"] < ready_cutoff)
     ]
     import concurrent.futures
 
@@ -58,7 +66,9 @@ def find_pr_files(owner_name, repo_name, snippets, days):
         return results
 
     merged_prs = [
-        pr["number"] for pr in pr_data if pr.get("merged_at") and pr["merged_at"] > days_ago
+        pr["number"] for pr in pr_data 
+        if pr.get("merged_at") and pr["merged_at"] > days_ago
+        and (ready_cutoff is None or pr["merged_at"] < ready_cutoff)
     ]
 
     results = []  # create an empty list to hold data for modified files that are referenced

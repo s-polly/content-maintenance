@@ -126,7 +126,7 @@ def main():
     )
     parser.add_argument(
         '--code-file',
-        default='outputs/code-counts-ai-foundry.csv',
+        default='outputs/code-counts-foundry.csv',
         help='Path to code counts CSV'
     )
     parser.add_argument(
